@@ -1,8 +1,9 @@
-const upstream = 'https://pdfgen2.up.railway.app/api/pdfs';
+const apiOrigin = 'https://pdfgen2.up.railway.app';
 
 export const handler = async (event) => {
   const incoming = new URL(event.rawUrl || `https://netlify.local${event.path || ''}`);
-  const target = new URL(upstream);
+  const route = incoming.pathname.startsWith('/api/') ? incoming.pathname : '/api/pdfs';
+  const target = new URL(apiOrigin + route);
   for (const [key, value] of incoming.searchParams) target.searchParams.set(key, value);
   const headers = {};
   if (event.headers?.['content-type']) headers['content-type'] = event.headers['content-type'];
@@ -14,8 +15,6 @@ export const handler = async (event) => {
   });
   const contentType = response.headers.get('content-type') || 'application/json';
   const data = Buffer.from(await response.arrayBuffer());
-  if (contentType.includes('application/pdf')) {
-    return { statusCode: response.status, isBase64Encoded: true, headers: { 'content-type': contentType, 'content-disposition': response.headers.get('content-disposition') || 'attachment' }, body: data.toString('base64') };
-  }
+  if (contentType.includes('application/pdf')) return { statusCode: response.status, isBase64Encoded: true, headers: { 'content-type': contentType, 'content-disposition': response.headers.get('content-disposition') || 'attachment' }, body: data.toString('base64') };
   return { statusCode: response.status, headers: { 'content-type': contentType, 'cache-control': 'no-store' }, body: data.toString('utf8') };
 };
