@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const storage = process.env.STORAGE_DIR || path.join(root, 'storage');
 const port = Number(process.env.PORT || 3000);
-const maxBytes = 8 * 1024 * 1024;
+const maxBytes = 50 * 1024 * 1024;
 await fs.mkdir(storage, { recursive: true });
 
 const sendJson = (res, status, body) => {
