@@ -28,7 +28,10 @@ async function listDocuments() {
   const files = await fs.readdir(storage);
   const docs = [];
   for (const file of files.filter(f => f.endsWith('.json'))) {
-    try { docs.push(JSON.parse(await fs.readFile(path.join(storage, file), 'utf8'))); } catch {}
+    try {
+      const { ownerToken, ...safe } = JSON.parse(await fs.readFile(path.join(storage, file), 'utf8'));
+      docs.push(safe);
+    } catch {}
   }
   return docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
